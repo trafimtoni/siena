@@ -237,6 +237,124 @@
             line-height: 1;
             color: var(--accent);
         }
+
+        /* ---------- 3D-модель дома (вид сверху) ---------- */
+        .house-scene {
+            perspective: 1100px;
+            height: 420px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .house-ground {
+            position: absolute;
+            width: 560px; height: 560px;
+            border-radius: 9999px;
+            background: radial-gradient(circle, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            left: 50%; top: 50%;
+            pointer-events: none;
+        }
+        .house-3d {
+            transform-style: preserve-3d;
+            position: relative;
+            width: 480px; height: 360px;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: grab;
+            touch-action: none;
+        }
+        .house-3d:active { cursor: grabbing; }
+        .h-room {
+            position: absolute;
+            border-radius: 10px;
+            transition: background 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        .h-room:hover, .h-room.selected { filter: brightness(1.12); }
+        .h-room-lit {
+            background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 32%, transparent), color-mix(in srgb, var(--accent) 12%, transparent));
+            box-shadow: inset 0 0 46px color-mix(in srgb, var(--accent) 45%, transparent);
+        }
+        .h-room-dark {
+            background: color-mix(in srgb, #64748b 16%, transparent);
+        }
+        .h-wall-h, .h-wall-v {
+            position: absolute;
+            background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.06));
+            border-radius: 3px;
+            transform: translateZ(34px);
+        }
+        .h-wall-h { height: 7px; }
+        .h-wall-v { width: 7px; }
+        .h-label {
+            position: absolute;
+            transform: translateZ(44px);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            text-shadow: 0 1px 8px var(--card-bg), 0 0 3px var(--card-bg);
+            white-space: nowrap;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .h-label i { font-size: 11px; opacity: 0.8; }
+        .h-count {
+            background: color-mix(in srgb, var(--accent) 18%, transparent);
+            color: var(--accent);
+            border-radius: 9999px;
+            padding: 1px 7px;
+            font-size: 10px;
+        }
+        .h-furniture {
+            position: absolute;
+            border-radius: 5px;
+            background: color-mix(in srgb, #ffffff 30%, transparent);
+            border: 1px solid rgba(255,255,255,0.35);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+            transform: translateZ(6px);
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.75);
+            font-size: 9px;
+        }
+        .h-shadow {
+            position: absolute;
+            left: 10px; top: 10px;
+            width: 460px; height: 340px;
+            border-radius: 14px;
+            background: rgba(2, 6, 23, 0.55);
+            filter: blur(22px);
+            transform: translateZ(-30px);
+            pointer-events: none;
+        }
+        .house-controls {
+            position: absolute;
+            top: 12px; right: 12px;
+            display: flex;
+            gap: 8px;
+            z-index: 5;
+        }
+        .house-ctrl-btn {
+            width: 34px; height: 34px;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: var(--card-bg);
+            color: var(--text-sub);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+        .house-ctrl-btn:hover { color: var(--accent); border-color: var(--accent); }
+        @media (max-width: 640px) {
+            .house-scene { height: 340px; perspective: 800px; }
+            .house-ground { width: 420px; height: 420px; }
+        }
         .sienna-msg { animation: msg-in 0.25s ease; }
         @keyframes msg-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
@@ -590,12 +708,27 @@
                 <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
                     <div>
                         <h2 class="text-2xl font-bold t-main tracking-tight">Комнаты</h2>
-                        <p class="text-sm t-sub">Нажмите на комнату, чтобы увидеть включённые приборы</p>
+                        <p class="text-sm t-sub">3D-модель дома · нажимайте на комнаты и перетаскивайте для вращения</p>
                     </div>
                     <button class="px-4 py-2.5 rounded-xl accent-bg text-white text-xs font-semibold shadow-sm hover:opacity-90 active:scale-95 transition-all accent-glow" onclick="openAddDeviceModal()">
                         <i class="fa-solid fa-plus mr-1"></i> Добавить устройство
                     </button>
                 </div>
+
+                <!-- 3D-модель дома (вид сверху) -->
+                <div class="glass-card rounded-2xl mb-6 overflow-hidden relative">
+                    <div class="house-scene" id="houseScene">
+                        <div class="house-ground"></div>
+                        <div class="house-3d" id="house3d"></div>
+                        <div class="house-controls">
+                            <button class="house-ctrl-btn" onclick="houseZoom(1)" aria-label="Приблизить" title="Приблизить"><i class="fa-solid fa-plus"></i></button>
+                            <button class="house-ctrl-btn" onclick="houseZoom(-1)" aria-label="Отдалить" title="Отдалить"><i class="fa-solid fa-minus"></i></button>
+                            <button class="house-ctrl-btn" onclick="houseReset()" aria-label="Сбросить вид" title="Сбросить вид"><i class="fa-solid fa-rotate-left"></i></button>
+                        </div>
+                        <div class="absolute bottom-3 left-4 text-[10px] t-mute" id="houseHint">Вращайте модель перетаскиванием · комнаты подсвечены при включённых приборах</div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5" id="floorPlan"></div>
 
                 <div class="glass-card rounded-2xl p-6 mt-6">
@@ -859,7 +992,9 @@
                 { id: 'd1', name: 'Главная люстра',          type: 'light', room: 'living',  state: true  },
                 { id: 'd2', name: 'Прикроватная лампа',      type: 'light', room: 'bedroom', state: false },
                 { id: 'd3', name: 'Smart TV 4K',             type: 'tv',    room: 'living',  state: true  },
-                { id: 'd4', name: 'Инверторный кондиционер', type: 'ac',    room: 'bedroom', state: false }
+                { id: 'd4', name: 'Инверторный кондиционер', type: 'ac',    room: 'bedroom', state: false },
+                { id: 'd5', name: 'Свет на кухне',          type: 'light', room: 'kitchen', state: true  },
+                { id: 'd6', name: 'Свет в ванной',          type: 'light', room: 'bath',    state: false }
             ]
         };
         let view = { month: new Date().getMonth(), year: new Date().getFullYear() };
@@ -922,6 +1057,13 @@
             if (!CLOCK_MODES.includes(state.clockMode)) state.clockMode = 'clock';
             if (!Number.isInteger(state.weatherCity) || state.weatherCity < 0 || state.weatherCity >= CITIES.length) state.weatherCity = 0;
             if (!Number.isInteger(state.radioStation) || state.radioStation < 0 || state.radioStation >= RADIO_STATIONS.length) state.radioStation = 0;
+            // 3D-модель: в сохранённых данных может не быть устройств кухни и ванной
+            if (!state.devices.some(d => d.room === 'kitchen')) {
+                state.devices.push({ id: 'd5', name: 'Свет на кухне', type: 'light', room: 'kitchen', state: false });
+            }
+            if (!state.devices.some(d => d.room === 'bath')) {
+                state.devices.push({ id: 'd6', name: 'Свет в ванной', type: 'light', room: 'bath', state: false });
+            }
 
             renderAll();
         }
@@ -1301,6 +1443,137 @@
             return { living: 'fa-couch', bedroom: 'fa-bed', kitchen: 'fa-utensils', bath: 'fa-bath' }[key] || 'fa-door-closed';
         }
 
+        /* =====================================================
+           3D-модель дома: планировка, комнаты, вращение, зум
+           ===================================================== */
+        // Планировка в условных единицах (1 ед = 1px), холст 480×360
+        const HOUSE_LAYOUT = [
+            // x, y, w, h, комната
+            { key: 'living',  x: 0,   y: 0,   w: 230, h: 180 },
+            { key: 'kitchen', x: 0,   y: 180, w: 230, h: 180 },
+            { key: 'bedroom', x: 230, y: 0,   w: 250, h: 180 },
+            { key: 'bath',    x: 230, y: 180, w: 250, h: 110 },
+            { key: 'hall',    x: 230, y: 290, w: 250, h: 70 }   // прихожая
+        ];
+        const HALL_NAME = { living: 'Гостиная', bedroom: 'Спальня', kitchen: 'Кухня', bath: 'Ванная', hall: 'Прихожая' };
+
+        // Мебель: [x, y, w, h, иконка]
+        const HOUSE_FURNITURE = {
+            living:  [ [18, 18, 90, 34, 'fa-couch'], [150, 22, 60, 24, 'fa-tv'], [40, 120, 44, 44, 'fa-mug-hot'] ],
+            kitchen: [ [14, 196, 200, 22, 'fa-kitchen-set'], [26, 260, 64, 44, 'fa-utensils'] ],
+            bedroom: [ [248, 16, 100, 70, 'fa-bed'], [356, 22, 26, 26, 'fa-mobile-screen'], [258, 120, 70, 34, 'fa-desktop'] ],
+            bath:    [ [244, 192, 46, 84, 'fa-shower'], [388, 196, 46, 34, 'fa-sink'] ],
+            hall:    [ [300, 312, 60, 30, 'fa-door-closed'] ]
+        };
+
+        // Стены: внешние (по периметру) + внутренние перегородки
+        const HOUSE_WALLS = [
+            // горизонтальные: x, y, длина
+            { dir: 'h', x: 0,   y: 0,   len: 480 },
+            { dir: 'h', x: 0,   y: 180, len: 230 },
+            { dir: 'h', x: 230, y: 180, len: 250 },
+            { dir: 'h', x: 230, y: 290, len: 250 },
+            { dir: 'h', x: 0,   y: 360, len: 480 },
+            // вертикальные: x, y, длина
+            { dir: 'v', x: 0,   y: 0,   len: 360 },
+            { dir: 'v', x: 230, y: 0,   len: 360 },
+            { dir: 'v', x: 480, y: 0,   len: 360 }
+        ];
+
+        let houseView = { rotX: 58, rotZ: -42, scale: 0.86 };   // масштаб уточняется в initHouse3D
+        let houseDragging = false;
+        let houseLast = { x: 0, y: 0 };
+
+        function houseApplyView() {
+            const el = document.getElementById('house3d');
+            if (!el) return;
+            el.style.transition = houseDragging ? 'none' : '';
+            el.style.transform = `rotateX(${houseView.rotX}deg) rotateZ(${houseView.rotZ}deg) scale(${houseView.scale})`;
+        }
+
+        // на узких экранах модель по умолчанию меньше
+        function houseDefaultScale() {
+            return window.innerWidth < 640 ? 0.55 : 0.86;
+        }
+
+        function houseZoom(dir) {
+            houseView.scale = Math.min(1.4, Math.max(0.45, houseView.scale + dir * 0.12));
+            houseApplyView();
+        }
+
+        function houseReset() {
+            houseView = { rotX: 58, rotZ: -42, scale: houseDefaultScale() };
+            houseApplyView();
+        }
+
+        function initHouse3D() {
+            const scene = document.getElementById('houseScene');
+            const root = document.getElementById('house3d');
+            if (!scene || !root) return;
+            houseView.scale = houseDefaultScale();
+
+            // разметка генерируется один раз
+            root.innerHTML = `
+                <div class="h-shadow"></div>
+                ${HOUSE_LAYOUT.map(r => `
+                    <div class="h-room" id="hroom-${r.key}" style="left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;" onclick="showRoomInfo('${r.key}')" title="${HALL_NAME[r.key]}"></div>
+                `).join('')}
+                ${HOUSE_WALLS.map(w => w.dir === 'h'
+                    ? `<div class="h-wall-h" style="left:${w.x}px;top:${w.y}px;width:${w.len}px;"></div>`
+                    : `<div class="h-wall-v" style="left:${w.x}px;top:${w.y}px;height:${w.len}px;"></div>`
+                ).join('')}
+                ${HOUSE_FURNITURE === undefined ? '' : Object.entries(HOUSE_FURNITURE).map(([room, items]) =>
+                    items.map(([x, y, w, h, icon]) =>
+                        `<div class="h-furniture" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;"><i class="fa-solid ${icon}"></i></div>`
+                    ).join('')
+                ).join('')}
+                ${HOUSE_LAYOUT.map(r => `
+                    <div class="h-label" style="left:${r.x + 10}px;top:${r.y + 8}px;">
+                        <i class="fa-solid ${getRoomIcon(r.key)}"></i>
+                        <span>${HALL_NAME[r.key]}</span>
+                        <span class="h-count" id="hcount-${r.key}"></span>
+                    </div>
+                `).join('')}
+            `;
+
+            // вращение перетаскиванием
+            scene.addEventListener('pointerdown', e => {
+                if (e.target.closest('button')) return;
+                houseDragging = true;
+                houseLast = { x: e.clientX, y: e.clientY };
+                scene.setPointerCapture(e.pointerId);
+            });
+            scene.addEventListener('pointermove', e => {
+                if (!houseDragging) return;
+                const dx = e.clientX - houseLast.x;
+                const dy = e.clientY - houseLast.y;
+                houseLast = { x: e.clientX, y: e.clientY };
+                houseView.rotZ += dx * 0.4;
+                houseView.rotX = Math.min(80, Math.max(10, houseView.rotX - dy * 0.25));
+                houseApplyView();
+            });
+            const stop = () => { houseDragging = false; };
+            scene.addEventListener('pointerup', stop);
+            scene.addEventListener('pointercancel', stop);
+
+            houseApplyView();
+            renderHouse3D();
+        }
+
+        // подсветка комнат по состоянию приборов
+        function renderHouse3D() {
+            HOUSE_LAYOUT.forEach(r => {
+                const el = document.getElementById('hroom-' + r.key);
+                const cnt = document.getElementById('hcount-' + r.key);
+                if (!el) return;
+                const devs = state.devices.filter(d => d.room === r.key);
+                const on = devs.filter(d => d.state).length;
+                el.classList.toggle('h-room-lit', on > 0);
+                el.classList.toggle('h-room-dark', on === 0);
+                if (cnt) cnt.innerText = on > 0 ? on + ' вкл' : '';
+            });
+        }
+
         function renderRooms() {
             const plan = document.getElementById('floorPlan');
             if (!plan) return;
@@ -1321,11 +1594,13 @@
                         </div>
                     </div>`;
             }).join('');
+            renderHouse3D();
         }
 
         function showRoomInfo(roomKey) {
             const active = state.devices.filter(d => d.room === roomKey && d.state).map(d => d.name);
-            notify(roomNames[roomKey], active.length ? 'Включены: ' + active.join(', ') : 'Все приборы выключены');
+            const label = HALL_NAME[roomKey] || roomNames[roomKey] || roomKey;
+            notify(label, active.length ? 'Включены: ' + active.join(', ') : 'Все приборы выключены');
         }
 
         /* ---------- Сценарии ---------- */
@@ -2476,6 +2751,7 @@
         window.addEventListener('load', function () {
             loadState();
             initSiennaFab();        // кнопка Сиены: клик — панель, долгое нажатие — голос
+            initHouse3D();          // 3D-модель дома в разделе «Комнаты»
             applyVolume();          // применяем сохранённую громкость после загрузки пользователей
             masterTick();
             setInterval(masterTick, 1000);   // часы, таймер и будильник тикают каждую секунду
