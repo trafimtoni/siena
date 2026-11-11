@@ -237,6 +237,12 @@
             line-height: 1;
             color: var(--accent);
         }
+        /* режим с фото на всю карточку: белый текст поверх снимка */
+        .greeting-photo .greeting-title, .greeting-photo .greeting-hello { color: #fff; }
+        .greeting-photo .greeting-name { color: #fff; text-shadow: 0 2px 12px rgba(2, 6, 23, 0.6); }
+        .greeting-photo .t-sub { color: rgba(255, 255, 255, 0.85) !important; }
+        .greeting-photo #greetingAvatar { box-shadow: 0 4px 18px rgba(2, 6, 23, 0.55); }
+        .greeting-photo .w-6.h-6.rounded-lg { background: rgba(255, 255, 255, 0.22); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
 
         /* ---------- 3D-модель дома (вид сверху) ---------- */
         .house-scene {
@@ -449,16 +455,19 @@
 
                     <div class="lg:col-span-8 flex flex-col gap-6">
 
-                        <!-- Приветствие: свайп по карточке — смена пользователя -->
-                        <div class="glass-card rounded-2xl p-6 sm:p-7 flex justify-between items-center select-none" id="greetingCard" style="touch-action: pan-y;" title="Свайп — смена пользователя">
-                            <div class="min-w-0">
+                        <!-- Приветствие: свайп по карточке — смена пользователя, фото — на всю карточку -->
+                        <div class="glass-card rounded-2xl p-6 sm:p-7 flex justify-between items-center select-none relative overflow-hidden" id="greetingCard" style="touch-action: pan-y;" title="Свайп — смена пользователя">
+                            <!-- фото пользователя на всю карточку (появляется, если загружено своё фото) -->
+                            <img id="greetingBgImg" alt="" class="hidden absolute inset-0 w-full h-full object-cover" draggable="false">
+                            <div id="greetingOverlay" class="hidden absolute inset-0" style="background: linear-gradient(to right, rgba(2, 6, 23, 0.82) 0%, rgba(2, 6, 23, 0.5) 55%, rgba(2, 6, 23, 0.18) 100%);"></div>
+                            <div class="min-w-0 relative z-10">
                                 <h2 class="greeting-title text-3xl sm:text-4xl font-bold t-main tracking-tight leading-tight" id="greetingText">
                                     <span class="greeting-hello">Привет,</span> <span class="greeting-name" id="greetingName">Антон</span><span class="greeting-name">!</span>
                                 </h2>
                                 <p class="t-sub text-sm mt-1.5">Свайп по карточке — смена пользователя, нажатие на аватар — смена иконки</p>
                             </div>
                             <!-- Аватар: клик — смена иконки, камера — своё фото, свайп по карточке — смена пользователя -->
-                            <div class="flex flex-col items-center gap-1.5 shrink-0 ml-4">
+                            <div class="flex flex-col items-center gap-1.5 shrink-0 ml-4 relative z-10">
                                 <div class="relative">
                                     <div id="greetingAvatar" class="w-20 h-20 sm:w-32 sm:h-32 rounded-3xl sm:rounded-[1.75rem] accent-bg flex items-center justify-center text-white text-3xl sm:text-5xl shadow-lg accent-glow select-none relative overflow-hidden" onclick="avatarClicked()" title="Нажмите — смена иконки, свайп по карточке — смена пользователя">
                                         <i id="greetingAvatarIcon" class="fa-solid fa-user-gear"></i>
@@ -1277,19 +1286,30 @@
             document.getElementById('userAvatar').innerHTML = avatarHTML(u);
             document.getElementById('taskOwner').innerText = 'Задачи пользователя: ' + u.name;
 
-            // Аватар в приветствии: фото или иконка
+            // Аватар в приветствии: фото или иконка; своё фото — ещё и на всю карточку
             const gIcon = document.getElementById('greetingAvatarIcon');
             const gImg = document.getElementById('greetingAvatarImg');
+            const gBg = document.getElementById('greetingBgImg');
+            const gOv = document.getElementById('greetingOverlay');
+            const gCard = document.getElementById('greetingCard');
             if (u.avatarPhoto) {
                 gImg.src = u.avatarPhoto;
                 gImg.classList.remove('hidden');
                 gIcon.classList.add('hidden');
                 document.getElementById('avatarRemoveBtn').classList.remove('hidden');
+                // фото как фон всей карточки
+                gBg.src = u.avatarPhoto;
+                gBg.classList.remove('hidden');
+                gOv.classList.remove('hidden');
+                gCard.classList.add('greeting-photo');
             } else {
                 gIcon.className = 'fa-solid ' + escapeHtml(u.avatar || AVATARS[0]);
                 gIcon.classList.remove('hidden');
                 gImg.classList.add('hidden');
                 document.getElementById('avatarRemoveBtn').classList.add('hidden');
+                gBg.classList.add('hidden');
+                gOv.classList.add('hidden');
+                gCard.classList.remove('greeting-photo');
             }
 
             document.getElementById('userMenuList').innerHTML = state.users.map(x => `
