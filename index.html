@@ -262,7 +262,7 @@
                 <div>
                     <h1 class="text-lg font-bold tracking-tight t-main" id="hubName">Долгобродская Smart Hub</h1>
                     <div class="flex items-center gap-2 text-xs t-sub font-medium">
-                        <span class="inline-block w-2 h-2 rounded-full bg-amber-500"></span>
+                        <span class="inline-block w-2 h-2 rounded-full bg-amber-500">Приветсвуем в умном хабе семьи Трофимчук</span>
                         Демо-режим · приборы не подключены
                     </div>
                 </div>
@@ -313,12 +313,12 @@
                             <div class="min-w-0">
                                 <span class="text-xs uppercase tracking-widest font-bold accent-color mb-1 block">Умный Дом · Хаб</span>
                                 <h2 class="text-2xl sm:text-3xl font-bold t-main tracking-tight truncate" id="greetingText">Привет, Антон!</h2>
-                                <p class="t-sub text-sm mt-1">Демонстрационная панель: состояние приборов хранится только в этом браузере.</p>
+                                <p class="t-sub text-sm mt-</p>
                             </div>
-                            <!-- Аватар: свайп или стрелки -- иконки, камера -- своё фото -->
+                            <!-- Аватар: свайп или стрелки — иконки, камера — своё фото -->
                             <div class="flex flex-col items-center gap-1.5 shrink-0 ml-4">
                                 <div class="relative">
-                                    <div id="greetingAvatar" class="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl accent-bg flex items-center justify-center text-white text-3xl sm:text-4xl shadow-lg accent-glow cursor-grab active:cursor-grabbing select-none relative overflow-hidden" style="touch-action: pan-y;" title="Свайп -- иконка, камера -- своё фото">
+                                    <div id="greetingAvatar" class="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl accent-bg flex items-center justify-center text-white text-3xl sm:text-4xl shadow-lg accent-glow cursor-grab active:cursor-grabbing select-none relative overflow-hidden" style="touch-action: pan-y;" title="Свайп — иконка, камера — своё фото">
                                         <i id="greetingAvatarIcon" class="fa-solid fa-user-gear"></i>
                                         <img id="greetingAvatarImg" alt="Фото профиля" class="hidden absolute inset-0 w-full h-full object-cover" draggable="false">
                                     </div>
@@ -353,8 +353,8 @@
                                 </div>
                             </div>
 
-                            <!-- Радио: обложка на весь виджет, станция -- свайпом -->
-                            <div class="relative overflow-hidden rounded-2xl shadow-lg select-none" id="radioCard" style="touch-action: pan-y;" title="Свайп влево/вправо -- смена станции">
+                            <!-- Радио: обложка на весь виджет, станция — свайпом -->
+                            <div class="relative overflow-hidden rounded-2xl shadow-lg select-none" id="radioCard" style="touch-action: pan-y;" title="Свайп влево/вправо — смена станции">
                                 <img id="coverImg" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=900&auto=format&fit=crop" alt="Обложка радио" class="absolute inset-0 w-full h-full object-cover" referrerpolicy="no-referrer" onerror="this.style.display='none'" draggable="false">
                                 <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(2, 6, 23, 0.88) 0%, rgba(2, 6, 23, 0.45) 55%, rgba(2, 6, 23, 0.15) 100%);"></div>
 
@@ -461,10 +461,10 @@
                                 <span id="bigClock" class="clock-time text-6xl sm:text-7xl font-extrabold t-main leading-none">00:00</span>
                                 <span id="clockSeconds" class="clock-sec text-xl font-bold accent-color">00</span>
                             </div>
-                            <div id="bigClockDate" class="text-xs font-semibold t-sub mt-3">--</div>
+                            <div id="bigClockDate" class="text-xs font-semibold t-sub mt-3">—</div>
                         </div>
 
-                        <!-- Календарь: клик по дате -- событие -->
+                        <!-- Календарь: клик по дате — событие -->
                         <div class="glass-card rounded-2xl p-6">
                             <div class="flex justify-between items-center mb-4">
                                 <button class="w-8 h-8 rounded-xl surface-2 t-sub flex items-center justify-center text-xs transition-colors" onclick="changeMonth(-1)" aria-label="Предыдущий месяц">
@@ -643,7 +643,7 @@
     </div>
 
     <!-- Сиена: кнопка ассистента -->
-    <button id="siennaBtn" onclick="toggleAssistant()" class="sienna-btn fixed bottom-6 right-6 z-40 w-16 h-16 rounded-2xl accent-bg text-white shadow-xl accent-glow flex items-center justify-center text-2xl" aria-label="Сиена -- умный помощник" title="Сиена -- умный помощник">
+    <button id="siennaBtn" onclick="toggleAssistant()" class="sienna-btn fixed bottom-6 right-6 z-40 w-16 h-16 rounded-2xl accent-bg text-white shadow-xl accent-glow flex items-center justify-center text-2xl" aria-label="Сиена — умный помощник" title="Сиена — умный помощник">
         <i class="fa-solid fa-wand-magic-sparkles"></i>
     </button>
 
@@ -1517,7 +1517,7 @@
             if (opening) {
                 if (!siennaGreeted) {
                     siennaGreeted = true;
-                    addMsg('bot', 'Привет! Я Сиена, помощник вашего дома. Скажите или напишите команду -- например «включи люстру», «сценарий ночь», «громкость 40». Голосом я активируюсь по слову «Сиена».');
+                    addMsg('bot', 'Привет! Я Сиена, помощник вашего дома. Скажите или напишите команду — например «включи люстру», «сценарий ночь», «громкость 40». Голосом я активируюсь по слову «Сиена».');
                 }
                 setTimeout(() => document.getElementById('siennaInput').focus(), 50);
             } else {
@@ -1596,7 +1596,7 @@
         function toggleMic() {
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SR) {
-                siennaReply('Голосовой ввод не поддерживается этим браузером. Введите команду текстом -- я всё равно помогу.');
+                siennaReply('Голосовой ввод не поддерживается этим браузером. Введите команду текстом — я всё равно помогу.');
                 return;
             }
             if (micActive) { stopMic(); return; }
@@ -1626,7 +1626,7 @@
                 recognition.start();
                 micActive = true;
                 updateMicUI();
-                addMsg('bot', 'Слушаю. Активируюсь по слову «Сиена» -- например: «Сиена, включи музыку».');
+                addMsg('bot', 'Слушаю. Активируюсь по слову «Сиена» — например: «Сиена, включи музыку».');
             } catch (e) {
                 stopMic();
             }
@@ -1645,7 +1645,7 @@
             } else if (low.startsWith('сиена')) {
                 text = text.slice(5);
             }
-            text = text.replace(/^[\s,.;:---]+/, '').trim();
+            text = text.replace(/^[\s,.;:—-]+/, '').trim();
             if (!text) {
                 siennaReply('Слушаю! Например: «включи люстру», «сценарий вечер», «громкость 30», «тёмная тема».');
                 return;
@@ -1741,7 +1741,7 @@
             if (/задач/.test(c) && /покажи|список|что нужно/.test(c)) {
                 const t = currentUser().tasks;
                 siennaReply(t.length
-                    ? 'Ваши задачи: ' + t.map(x => (x.done ? 'выполнено -- ' : '') + '«' + x.text + '»').join('; ') + '.'
+                    ? 'Ваши задачи: ' + t.map(x => (x.done ? 'выполнено — ' : '') + '«' + x.text + '»').join('; ') + '.'
                     : 'Задач пока нет. Скажите: «добавь задачу …».');
                 return;
             }
@@ -1753,7 +1753,7 @@
                 const now = new Date();
                 state.events.push({ id: Date.now(), date: dateKey(now.getFullYear(), now.getMonth(), now.getDate()), title: title });
                 saveState(); renderCalendar(); renderUpcomingEvents();
-                siennaReply('Добавила событие на сегодня: «' + title + '». Если нужна другая дата -- нажмите на неё в календаре.');
+                siennaReply('Добавила событие на сегодня: «' + title + '». Если нужна другая дата — нажмите на неё в календаре.');
                 return;
             }
 
@@ -1866,7 +1866,7 @@
             renderPlayer();
             const audio = document.getElementById('radioPlayer');
             if (isPlaying) {
-                // Играла другая станция -- переключаем поток на лету
+                // Играла другая станция — переключаем поток на лету
                 audio.src = RADIO_STATIONS[i].url;
                 audio.play().catch(() => {
                     setPlayingUI(false);
@@ -1934,7 +1934,7 @@
             function angleToVolume(e) {
                 const rect = knob.getBoundingClientRect();
                 const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
-                const a = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI + 90; // 0° -- вверх
+                const a = Math.atan2(e.clientY - cy, e.clientX - cx) * 180 / Math.PI + 90; // 0° — вверх
                 return Math.max(0, Math.min(100, Math.round(((a + 135) / 270) * 100)));
             }
             knob.addEventListener('pointerdown', e => {
@@ -1976,13 +1976,13 @@
         }
 
         function initSwipes() {
-            // Свайп по всему радио-виджету -- смена радиостанции
+            // Свайп по всему радио-виджету — смена радиостанции
             attachSwipe(
                 document.getElementById('radioCard'),
                 () => selectStation(state.radioStation + 1),
                 () => selectStation(state.radioStation - 1)
             );
-            // Свайп по аватару -- смена аватара
+            // Свайп по аватару — смена аватара
             attachSwipe(
                 document.getElementById('greetingAvatar'),
                 () => cycleAvatar(1),
@@ -2008,7 +2008,7 @@
             audio.addEventListener('error', () => {
                 if (audio.getAttribute('src')) { setPlayingUI(false); notify('Аудио', 'Поток недоступен'); }
             });
-            // Пользователи ещё не загружены -- громкость применится после загрузки состояния
+            // Пользователи ещё не загружены — громкость применится после загрузки состояния
             if (state.users.length) applyVolume();
         });
 
