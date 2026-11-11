@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
-    <title>Долгобродская</title>
+    <title>Долгобродская Smart Home</title>
 
     <!-- Применяем тему до отрисовки страницы, чтобы не было вспышки светлого фона -->
     <script>
@@ -25,7 +25,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Comfortaa:wght@400;500;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -220,6 +220,23 @@
         }
         .sienna-fab:hover { transform: translateY(-3px); background: color-mix(in srgb, var(--accent) 22%, transparent); }
         .sienna-fab:active { transform: scale(0.95); }
+        .sienna-fab.sienna-holding { transform: scale(1.12); background: color-mix(in srgb, var(--accent) 28%, transparent); }
+        .sienna-fab.sienna-listening { animation: sienna-pulse 1.6s ease-in-out infinite; }
+        @keyframes sienna-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+            50% { box-shadow: 0 0 0 12px color-mix(in srgb, var(--accent) 0%, transparent); }
+        }
+
+        /* ---------- Приветствие: скруглённый шрифт + рукописное имя ---------- */
+        .greeting-title { font-family: 'Comfortaa', 'Plus Jakarta Sans', sans-serif; }
+        .greeting-hello { font-weight: 500; }
+        .greeting-name {
+            font-family: 'Caveat', cursive;
+            font-weight: 700;
+            font-size: 1.35em;
+            line-height: 1;
+            color: var(--accent);
+        }
         .sienna-msg { animation: msg-in 0.25s ease; }
         @keyframes msg-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
@@ -270,17 +287,13 @@
                     <i class="fa-solid fa-house-signal text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold tracking-tight t-main" id="hubName">Долгобродская</h1>
-                    <div class="flex items-center gap-2 text-xs t-sub font-medium">
-                        <span class="inline-block w-2 h-2 rounded-full bg-amber-500"></span>
-                        Система умного дома · приборы не подключены
-                    </div>
+                    <h1 class="text-lg font-bold tracking-tight t-main" id="hubName">Долгобродская Smart Hub</h1>
                 </div>
             </div>
 
             <nav class="flex items-center gap-6 sm:gap-8 px-5 py-2.5 rounded-full border hairline shadow-inner" style="background: var(--nav-bg);" aria-label="Разделы">
-                <a href="#" class="nav-link text-sm active" data-view="overview" onclick="switchView('overview'); return false;">Главная</a>
-                <a href="#" class="nav-link text-sm" data-view="rooms" onclick="switchView('rooms'); return false;">Дом</a>
+                <a href="#" class="nav-link text-sm active" data-view="overview" onclick="switchView('overview'); return false;">Обзор</a>
+                <a href="#" class="nav-link text-sm" data-view="rooms" onclick="switchView('rooms'); return false;">Комнаты</a>
                 <a href="#" class="nav-link text-sm" data-view="settings" onclick="switchView('settings'); return false;">Настройки</a>
             </nav>
 
@@ -321,14 +334,15 @@
                         <!-- Приветствие: свайп по карточке — смена пользователя -->
                         <div class="glass-card rounded-2xl p-6 sm:p-7 flex justify-between items-center select-none" id="greetingCard" style="touch-action: pan-y;" title="Свайп — смена пользователя">
                             <div class="min-w-0">
-                                <span class="text-xs uppercase tracking-widest font-bold accent-color mb-1 block">Умный Дом · Хаб</span>
-                                <h2 class="text-2xl sm:text-3xl font-bold t-main tracking-tight truncate" id="greetingText">Привет, Антон!</h2>
-                                <p class="t-sub text-sm mt-1">Демонстрационная панель: состояние приборов хранится только в этом браузере.</p>
+                                <h2 class="greeting-title text-3xl sm:text-4xl font-bold t-main tracking-tight leading-tight" id="greetingText">
+                                    <span class="greeting-hello">Привет,</span> <span class="greeting-name" id="greetingName">Антон</span><span class="greeting-name">!</span>
+                                </h2>
+                                <p class="t-sub text-sm mt-1.5">Свайп по карточке — смена пользователя, нажатие на аватар — смена иконки</p>
                             </div>
                             <!-- Аватар: клик — смена иконки, камера — своё фото, свайп по карточке — смена пользователя -->
                             <div class="flex flex-col items-center gap-1.5 shrink-0 ml-4">
                                 <div class="relative">
-                                    <div id="greetingAvatar" class="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl accent-bg flex items-center justify-center text-white text-3xl sm:text-4xl shadow-lg accent-glow select-none relative overflow-hidden" onclick="avatarClicked()" title="Нажмите — смена иконки, свайп по карточке — смена пользователя">
+                                    <div id="greetingAvatar" class="w-20 h-20 sm:w-32 sm:h-32 rounded-3xl sm:rounded-[1.75rem] accent-bg flex items-center justify-center text-white text-3xl sm:text-5xl shadow-lg accent-glow select-none relative overflow-hidden" onclick="avatarClicked()" title="Нажмите — смена иконки, свайп по карточке — смена пользователя">
                                         <i id="greetingAvatarIcon" class="fa-solid fa-user-gear"></i>
                                         <img id="greetingAvatarImg" alt="Фото профиля" class="hidden absolute inset-0 w-full h-full object-cover" draggable="false">
                                     </div>
@@ -521,7 +535,7 @@
                                 <div id="alarmList" class="mt-3 space-y-1 max-h-36 overflow-y-auto pr-1"></div>
                             </div>
 
-                            <p class="text-[10px] t-mute mt-3.5"></p>
+                            <p class="text-[10px] t-mute mt-3.5">Свайп: часы · таймер · будильник</p>
                         </div>
 
                         <!-- Календарь: клик по дате — событие -->
@@ -598,6 +612,7 @@
                 <div class="mb-6">
                     <h2 class="text-2xl font-bold t-main tracking-tight">Настройки</h2>
                     <p class="text-sm t-sub">Профиль, оформление и пользователи</p>
+                    <p class="text-[11px] t-mute mt-1.5">Демо-режим: состояние приборов хранится только в этом браузере и не управляет реальными устройствами.</p>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -702,8 +717,8 @@
         </div>
     </div>
 
-    <!-- Сиена: кнопка ассистента -->
-    <button id="siennaBtn" onclick="toggleAssistant()" class="sienna-fab fixed bottom-6 right-6 z-40" aria-label="Сиена — умный помощник" title="Сиена — умный помощник">
+    <!-- Сиена: кнопка ассистента (клик — панель, долгое нажатие — голосовое управление) -->
+    <button id="siennaBtn" class="sienna-fab fixed bottom-6 right-6 z-40" aria-label="Сиена — умный помощник" title="Нажмите — панель, удерживайте — голосовое управление">
         <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
     </button>
 
@@ -1115,7 +1130,7 @@
            ===================================================== */
         function renderUserUI() {
             const u = currentUser();
-            document.getElementById('greetingText').innerText = 'Привет, ' + u.name + '!';
+            document.getElementById('greetingName').innerText = u.name;
             document.getElementById('userBtnName').innerText = u.name;
             document.getElementById('userAvatar').innerHTML = avatarHTML(u);
             document.getElementById('taskOwner').innerText = 'Задачи пользователя: ' + u.name;
@@ -1814,6 +1829,48 @@
                 stopMic();
             }
         }
+
+        /* ---------- Кнопка Сиены: клик — панель, долгое нажатие — голосовое управление ---------- */
+        let siennaPressTimer = null;
+        let siennaLongFired = false;
+
+        function siennaVoiceActivate() {
+            const panel = document.getElementById('siennaPanel');
+            if (panel.classList.contains('hidden')) toggleAssistant();   // открыть панель
+            if (!micActive) toggleMic();                                  // включить микрофон
+            if (micActive) {
+                notify('Сиена', 'Голосовое управление включено — скажите «Сиена, …»');
+            }
+        }
+
+        function initSiennaFab() {
+            const btn = document.getElementById('siennaBtn');
+            if (!btn) return;
+            const LONG_MS = 550;
+
+            btn.addEventListener('pointerdown', e => {
+                e.preventDefault();
+                siennaLongFired = false;
+                btn.classList.add('sienna-holding');
+                siennaPressTimer = setTimeout(() => {
+                    siennaLongFired = true;
+                    btn.classList.remove('sienna-holding');
+                    siennaVoiceActivate();
+                }, LONG_MS);
+            });
+            const release = () => {
+                clearTimeout(siennaPressTimer);
+                btn.classList.remove('sienna-holding');
+            };
+            btn.addEventListener('pointerup', () => {
+                release();
+                if (!siennaLongFired) toggleAssistant();   // обычный клик
+            });
+            btn.addEventListener('pointerleave', release);
+            btn.addEventListener('pointercancel', release);
+            // долгий тап на мобильных не должен открывать контекстное меню
+            btn.addEventListener('contextmenu', e => e.preventDefault());
+        }
         function closeSienna() {
             document.getElementById('siennaPanel').classList.add('hidden');
             stopMic();
@@ -1868,6 +1925,14 @@
                 ? '<i class="fa-solid fa-microphone-slash"></i>'
                 : '<i class="fa-solid fa-microphone"></i>';
             btn.setAttribute('aria-label', micActive ? 'Остановить прослушивание' : 'Голосовая активация');
+            // пульсирующая кнопка Сиены, пока идёт прослушивание
+            const fab = document.getElementById('siennaBtn');
+            if (fab) {
+                fab.classList.toggle('sienna-listening', micActive);
+                fab.innerHTML = micActive
+                    ? '<i class="fa-solid fa-microphone text-xl"></i>'
+                    : '<i class="fa-solid fa-wand-magic-sparkles text-xl"></i>';
+            }
             const st = document.getElementById('siennaStatus');
             st.innerHTML = micActive
                 ? 'Слушаю: скажите «Сиена, …»<span class="wave ml-1"></span><span class="wave"></span><span class="wave"></span>'
@@ -2410,6 +2475,7 @@
            ===================================================== */
         window.addEventListener('load', function () {
             loadState();
+            initSiennaFab();        // кнопка Сиены: клик — панель, долгое нажатие — голос
             applyVolume();          // применяем сохранённую громкость после загрузки пользователей
             masterTick();
             setInterval(masterTick, 1000);   // часы, таймер и будильник тикают каждую секунду
