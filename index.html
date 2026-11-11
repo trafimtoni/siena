@@ -208,16 +208,26 @@
         .clock-sec { animation: tick 1s steps(1) infinite; }
 
         /* ---------- Сиена: ассистент ---------- */
-        .sienna-btn { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .sienna-btn:hover { transform: translateY(-2px) scale(1.05); }
-        .sienna-btn.listening { animation: pulse-ring 1.6s infinite; }
-        @keyframes pulse-ring {
-            0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.45); }
-            70% { box-shadow: 0 0 0 18px rgba(13, 148, 136, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+        .sienna-fab {
+            width: 56px; height: 56px; border-radius: 9999px;
+            display: flex; align-items: center; justify-content: center;
+            background: color-mix(in srgb, var(--accent) 14%, transparent);
+            -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+            border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+            color: var(--accent);
+            box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--accent) 60%, transparent);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s ease, box-shadow 0.25s ease;
         }
+        .sienna-fab:hover { transform: translateY(-3px); background: color-mix(in srgb, var(--accent) 22%, transparent); }
+        .sienna-fab:active { transform: scale(0.95); }
         .sienna-msg { animation: msg-in 0.25s ease; }
         @keyframes msg-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+        /* ---------- Часы: режимы ---------- */
+        .chip { padding: 6px 12px; border-radius: 9999px; font-size: 11px; font-weight: 700; background: var(--surface-2); color: var(--text-sub); transition: all 0.2s ease; }
+        .chip:hover { background: var(--surface-3); color: var(--text-main); }
+        .clock-mode-dot { width: 6px; height: 6px; border-radius: 9999px; background: var(--surface-3); transition: background 0.2s ease; }
+        .clock-mode-dot.active { background: var(--accent); }
         .wave { display: inline-block; width: 3px; margin: 0 1px; border-radius: 99px; background: var(--accent); animation: wave-b 1s infinite ease-in-out; }
         @keyframes wave-b { 0%, 100% { height: 6px; } 50% { height: 14px; } }
 
@@ -308,48 +318,62 @@
 
                     <div class="lg:col-span-8 flex flex-col gap-6">
 
-                        <!-- Приветствие -->
-                        <div class="glass-card rounded-2xl p-6 sm:p-7 flex justify-between items-center">
+                        <!-- Приветствие: свайп по карточке — смена пользователя -->
+                        <div class="glass-card rounded-2xl p-6 sm:p-7 flex justify-between items-center select-none" id="greetingCard" style="touch-action: pan-y;" title="Свайп — смена пользователя">
                             <div class="min-w-0">
                                 <span class="text-xs uppercase tracking-widest font-bold accent-color mb-1 block">Умный Дом · Хаб</span>
                                 <h2 class="text-2xl sm:text-3xl font-bold t-main tracking-tight truncate" id="greetingText">Привет, Антон!</h2>
-                                <p class="t-sub text-sm mt-</p>
+                                <p class="t-sub text-sm mt-1">Демонстрационная панель: состояние приборов хранится только в этом браузере.</p>
                             </div>
-                            <!-- Аватар: свайп или стрелки — иконки, камера — своё фото -->
+                            <!-- Аватар: клик — смена иконки, камера — своё фото, свайп по карточке — смена пользователя -->
                             <div class="flex flex-col items-center gap-1.5 shrink-0 ml-4">
                                 <div class="relative">
-                                    <div id="greetingAvatar" class="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl accent-bg flex items-center justify-center text-white text-3xl sm:text-4xl shadow-lg accent-glow cursor-grab active:cursor-grabbing select-none relative overflow-hidden" style="touch-action: pan-y;" title="Свайп — иконка, камера — своё фото">
+                                    <div id="greetingAvatar" class="w-16 h-16 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl accent-bg flex items-center justify-center text-white text-3xl sm:text-4xl shadow-lg accent-glow select-none relative overflow-hidden" onclick="avatarClicked()" title="Нажмите — смена иконки, свайп по карточке — смена пользователя">
                                         <i id="greetingAvatarIcon" class="fa-solid fa-user-gear"></i>
                                         <img id="greetingAvatarImg" alt="Фото профиля" class="hidden absolute inset-0 w-full h-full object-cover" draggable="false">
                                     </div>
                                     <button id="avatarRemoveBtn" class="hidden absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full bg-rose-500 text-white text-[10px] flex items-center justify-center shadow-md border-2" style="border-color: var(--card-bg);" onclick="clearAvatarPhoto(event)" aria-label="Убрать фото" title="Убрать фото">
-                                        <i class="fa-solid fa-xmark">Приветсвуем в умном хабе семьи Трофимчук</i>
+                                        <i class="fa-solid fa-xmark"></i>
                                     </button>
                                 </div>
                                 <div class="flex items-center gap-1.5">
-                                    <button class="w-6 h-6 rounded-lg surface-2 t-sub flex items-center justify-center text-[10px]" onclick="cycleAvatar(-1)" aria-label="Предыдущий аватар"><i class="fa-solid fa-chevron-left"></i></button>
+                                    <button class="w-6 h-6 rounded-lg surface-2 t-sub flex items-center justify-center text-[10px]" onclick="switchUserByDir(-1)" aria-label="Предыдущий пользователь"><i class="fa-solid fa-chevron-left"></i></button>
                                     <label class="w-6 h-6 rounded-lg surface-2 t-sub flex items-center justify-center text-[10px] cursor-pointer" title="Загрузить своё фото" aria-label="Загрузить своё фото">
                                         <i class="fa-solid fa-camera"></i>
                                         <input type="file" accept="image/*" class="hidden" onchange="handleAvatarUpload(event)">
                                     </label>
-                                    <button class="w-6 h-6 rounded-lg surface-2 t-sub flex items-center justify-center text-[10px]" onclick="cycleAvatar(1)" aria-label="Следующий аватар"><i class="fa-solid fa-chevron-right"></i></button>
+                                    <button class="w-6 h-6 rounded-lg surface-2 t-sub flex items-center justify-center text-[10px]" onclick="switchUserByDir(1)" aria-label="Следующий пользователь"><i class="fa-solid fa-chevron-right"></i></button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Погода + радио -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <!-- Погода -->
-                            <div class="glass-card rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between">
-                                <div class="flex justify-between items-start">
-                                    <span class="text-xs font-semibold uppercase tracking-wider t-mute">Погода снаружи</span>
-                                    <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center text-sm">
-                                        <i class="fa-solid fa-cloud-sun"></i>
+                            <!-- Погода: город меняется свайпом, фото города на весь виджет -->
+                            <div class="relative overflow-hidden rounded-2xl shadow-lg select-none" id="weatherCard" style="touch-action: pan-y;" title="Свайп — смена города">
+                                <img id="cityImg" src="https://images.unsplash.com/photo-1513326738677-b964603b136d?q=80&w=900&auto=format&fit=crop" alt="Фото города" class="absolute inset-0 w-full h-full object-cover" referrerpolicy="no-referrer" onerror="this.style.display='none'" draggable="false">
+                                <div class="absolute inset-0" style="background: linear-gradient(to top, rgba(2, 6, 23, 0.85) 0%, rgba(2, 6, 23, 0.3) 60%, rgba(2, 6, 23, 0.05) 100%);"></div>
+
+                                <div class="relative flex flex-col h-full min-h-[280px] p-5 sm:p-6">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[11px] font-bold uppercase tracking-wider text-white/90">Погода снаружи</span>
+                                        <div class="hidden sm:flex items-center gap-1 text-white/60 text-sm">
+                                            <i class="fa-solid fa-chevron-left"></i>
+                                            <span class="text-[10px] font-bold uppercase tracking-wider">свайп</span>
+                                            <i class="fa-solid fa-chevron-right"></i>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="text-4xl sm:text-5xl font-extrabold my-3 tracking-tight accent-color" id="weatherTemp">--°C</div>
-                                <div class="flex items-center gap-2 text-xs font-medium t-sub" id="weatherDesc">
-                                    <i class="fa-solid fa-spinner animate-spin"></i> Получение данных...
+
+                                    <div class="mt-auto pt-4">
+                                        <div class="weather-temp text-6xl font-extrabold text-white tracking-tight leading-none" id="weatherTemp">--°C</div>
+                                        <div class="flex items-center gap-2 text-sm font-medium text-white/85 mt-2" id="weatherDesc">
+                                            <i class="fa-solid fa-spinner animate-spin"></i> Получение данных...
+                                        </div>
+                                        <div class="flex items-end justify-between mt-3">
+                                            <div id="weatherCityName" class="text-lg font-extrabold text-white">Москва</div>
+                                            <div id="weatherDots" class="flex gap-1.5 pb-1"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -455,13 +479,49 @@
                     <!-- Правая колонка -->
                     <div class="lg:col-span-4 flex flex-col gap-6">
 
-                        <!-- Крупные часы -->
-                        <div class="glass-card rounded-2xl px-6 py-7 text-center">
-                            <div class="flex items-baseline justify-center gap-1.5">
-                                <span id="bigClock" class="clock-time text-6xl sm:text-7xl font-extrabold t-main leading-none">00:00</span>
-                                <span id="clockSeconds" class="clock-sec text-xl font-bold accent-color">00</span>
+                        <!-- Часы → таймер → будильник: свайп по виджету -->
+                        <div class="glass-card rounded-2xl px-6 py-6 text-center select-none" id="clockWidget" style="touch-action: pan-y;" title="Свайп: часы → таймер → будильник">
+                            <div class="flex items-center justify-between mb-3">
+                                <span id="clockModeLabel" class="text-[10px] font-bold uppercase tracking-wider t-mute">Часы</span>
+                                <div id="clockModeDots" class="flex items-center gap-1.5"></div>
                             </div>
-                            <div id="bigClockDate" class="text-xs font-semibold t-sub mt-3">—</div>
+
+                            <!-- Режим 1: часы -->
+                            <div id="clockView">
+                                <div class="flex items-baseline justify-center gap-1.5">
+                                    <span id="bigClock" class="clock-time text-6xl sm:text-7xl font-extrabold t-main leading-none">00:00</span>
+                                    <span id="clockSeconds" class="clock-sec text-xl font-bold accent-color">00</span>
+                                </div>
+                                <div id="bigClockDate" class="text-xs font-semibold t-sub mt-3">—</div>
+                            </div>
+
+                            <!-- Режим 2: таймер -->
+                            <div id="timerView" class="hidden">
+                                <div id="timerDisplay" class="clock-time text-6xl font-extrabold t-main leading-none">00:00</div>
+                                <div class="flex flex-wrap justify-center gap-2 mt-4">
+                                    <button class="chip" onclick="setTimerPreset(60)">1 мин</button>
+                                    <button class="chip" onclick="setTimerPreset(300)">5 мин</button>
+                                    <button class="chip" onclick="setTimerPreset(600)">10 мин</button>
+                                    <button class="chip" onclick="setTimerPreset(1500)">25 мин</button>
+                                </div>
+                                <div class="flex justify-center gap-3 mt-4">
+                                    <button id="timerStartBtn" class="px-6 py-2.5 rounded-xl accent-bg text-white text-xs font-bold shadow accent-glow hover:opacity-90 active:scale-95 transition-all" onclick="timerToggle()">Старт</button>
+                                    <button class="px-6 py-2.5 rounded-xl surface-2 t-sub text-xs font-bold transition-colors" onclick="timerReset()">Сброс</button>
+                                </div>
+                            </div>
+
+                            <!-- Режим 3: будильник -->
+                            <div id="alarmView" class="hidden">
+                                <div class="flex items-center gap-2">
+                                    <input type="time" id="newAlarmTime" value="07:00" class="field flex-1 rounded-xl px-3.5 py-2.5 text-sm text-center font-bold" aria-label="Время будильника">
+                                    <button class="w-10 h-10 shrink-0 rounded-xl accent-bg text-white flex items-center justify-center text-xs shadow hover:opacity-90 active:scale-95 transition-all" onclick="addAlarm()" aria-label="Добавить будильник">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                </div>
+                                <div id="alarmList" class="mt-3 space-y-1 max-h-36 overflow-y-auto pr-1"></div>
+                            </div>
+
+                            <p class="text-[10px] t-mute mt-3.5">Свайп: часы · таймер · будильник</p>
                         </div>
 
                         <!-- Календарь: клик по дате — событие -->
@@ -643,8 +703,8 @@
     </div>
 
     <!-- Сиена: кнопка ассистента -->
-    <button id="siennaBtn" onclick="toggleAssistant()" class="sienna-btn fixed bottom-6 right-6 z-40 w-16 h-16 rounded-2xl accent-bg text-white shadow-xl accent-glow flex items-center justify-center text-2xl" aria-label="Сиена — умный помощник" title="Сиена — умный помощник">
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
+    <button id="siennaBtn" onclick="toggleAssistant()" class="sienna-fab fixed bottom-6 right-6 z-40" aria-label="Сиена — умный помощник" title="Сиена — умный помощник">
+        <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
     </button>
 
     <!-- Сиена: панель ассистента -->
@@ -727,12 +787,24 @@
             { name: 'SomaFM Indie Pop',    desc: 'Инди-поп хиты',                 url: 'https://ice1.somafm.com/indiepop-128-mp3', cover: 'https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?q=80&w=400&auto=format&fit=crop' }
         ];
 
-        // Аватары: свайп по аватару в приветствии переключает по кругу
+        // Аватары: клик по аватару переключает по кругу
         const AVATARS = [
             'fa-user-gear', 'fa-user-astronaut', 'fa-user-ninja', 'fa-user-secret',
             'fa-user-shield', 'fa-user-tie', 'fa-user-graduate', 'fa-user-mechanic',
             'fa-cat', 'fa-dog', 'fa-dragon', 'fa-otter', 'fa-crow', 'fa-hippo'
         ];
+
+        // Города в виджете погоды: свайп переключает по кругу
+        const CITIES = [
+            { name: 'Москва',            lat: 55.75, lon: 37.61, img: 'https://images.unsplash.com/photo-1513326738677-b964603b136d?q=80&w=900&auto=format&fit=crop' },
+            { name: 'Санкт-Петербург',  lat: 59.94, lon: 30.31, img: 'https://images.unsplash.com/photo-1761693971474-b5c8397d6764?q=80&w=900&auto=format&fit=crop' },
+            { name: 'Минск',             lat: 53.90, lon: 27.57, img: 'https://images.unsplash.com/photo-1683483581187-221e83dbecc7?q=80&w=900&auto=format&fit=crop' },
+            { name: 'Амстердам',          lat: 52.37, lon: 4.90,  img: 'https://images.unsplash.com/photo-1534351590666-13e3e96b5017?q=80&w=900&auto=format&fit=crop' }
+        ];
+
+        // Режимы виджета часов: свайп переключает по кругу
+        const CLOCK_MODES = ['clock', 'timer', 'alarm'];
+        const CLOCK_LABELS = { clock: 'Часы', timer: 'Таймер', alarm: 'Будильник' };
 
         const NEWS_SOURCES = {
             lenta:  { name: 'Lenta.ru',  rss: 'https://lenta.ru/rss/news' },
@@ -765,6 +837,9 @@
             log: [],
             radioStation: 0,
             events: [],   // события календаря: { id, date: 'YYYY-MM-DD', title }
+            clockMode: 'clock',   // часы | таймер | будильник
+            weatherCity: 0,
+            alarms: [],   // будильники: { id, time: 'HH:MM', on, lastFired }
             devices: [
                 { id: 'd1', name: 'Главная люстра',          type: 'light', room: 'living',  state: true  },
                 { id: 'd2', name: 'Прикроватная лампа',      type: 'light', room: 'bedroom', state: false },
@@ -828,6 +903,9 @@
             if (!NEWS_SOURCES[state.newsSource]) state.newsSource = 'lenta';
             if (!Array.isArray(state.log)) state.log = [];
             if (!Array.isArray(state.events)) state.events = [];
+            if (!Array.isArray(state.alarms)) state.alarms = [];
+            if (!CLOCK_MODES.includes(state.clockMode)) state.clockMode = 'clock';
+            if (!Number.isInteger(state.weatherCity) || state.weatherCity < 0 || state.weatherCity >= CITIES.length) state.weatherCity = 0;
             if (!Number.isInteger(state.radioStation) || state.radioStation < 0 || state.radioStation >= RADIO_STATIONS.length) state.radioStation = 0;
 
             renderAll();
@@ -855,7 +933,8 @@
             renderNewsSources();
             renderPlayer();
             renderUpcomingEvents();
-            renderClock();
+            renderClockWidget();
+            renderWeatherCity();
         }
 
         /* =====================================================
@@ -1489,7 +1568,7 @@
         }
 
         /* =====================================================
-           Крупные часы
+           Часы → таймер → будильник (свайп по виджету)
            ===================================================== */
         function renderClock() {
             const now = new Date();
@@ -1503,7 +1582,218 @@
             const wd = weekdays[now.getDay()];
             const dateStr = wd.charAt(0).toUpperCase() + wd.slice(1) + ', ' + now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear();
             document.getElementById('bigClockDate').innerText = dateStr;
-            document.getElementById('bigClockDate').classList.remove('capitalize');
+        }
+
+        function setClockMode(mode) {
+            state.clockMode = mode;
+            saveState();
+            renderClockWidget();
+            notify(CLOCK_LABELS[mode], 'Режим: ' + CLOCK_LABELS[mode]);
+        }
+
+        function clockModeSwipe(dir) {
+            let i = CLOCK_MODES.indexOf(state.clockMode);
+            i = (i + dir + CLOCK_MODES.length) % CLOCK_MODES.length;
+            setClockMode(CLOCK_MODES[i]);
+        }
+
+        function renderClockWidget() {
+            CLOCK_MODES.forEach(k => {
+                const el = document.getElementById(k + 'View');
+                if (el) el.classList.toggle('hidden', k !== state.clockMode);
+            });
+            document.getElementById('clockModeLabel').innerText = CLOCK_LABELS[state.clockMode];
+            document.getElementById('clockModeDots').innerHTML = CLOCK_MODES.map(m =>
+                `<span class="clock-mode-dot ${m === state.clockMode ? 'active' : ''}"></span>`
+            ).join('');
+            renderClock();
+            renderTimer();
+            renderAlarms();
+        }
+
+        /* ---------- Таймер ---------- */
+        let timer = { remaining: 0, endTs: null, running: false };
+
+        function fmtTimer(s) {
+            const m = Math.floor(s / 60), ss = s % 60;
+            return String(m).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
+        }
+        function renderTimer() {
+            const el = document.getElementById('timerDisplay');
+            const btn = document.getElementById('timerStartBtn');
+            if (!el) return;
+            el.innerText = fmtTimer(timer.remaining);
+            el.style.color = timer.running ? 'var(--accent)' : '';
+            if (btn) btn.innerText = timer.running ? 'Пауза' : 'Старт';
+        }
+        function setTimerPreset(sec) {
+            timer = { remaining: sec, endTs: null, running: false };
+            renderTimer();
+        }
+        function timerToggle() {
+            if (timer.running) {
+                timer.remaining = Math.max(0, Math.ceil((timer.endTs - Date.now()) / 1000));
+                timer.running = false;
+                renderTimer();
+                return;
+            }
+            if (timer.remaining <= 0) { notify('Таймер', 'Сначала выберите длительность'); return; }
+            timer.endTs = Date.now() + timer.remaining * 1000;
+            timer.running = true;
+            renderTimer();
+        }
+        function timerReset() {
+            timer = { remaining: 0, endTs: null, running: false };
+            renderTimer();
+        }
+        function timerTick() {
+            if (!timer.running) return;
+            timer.remaining = Math.max(0, Math.ceil((timer.endTs - Date.now()) / 1000));
+            if (timer.remaining === 0) {
+                timer.running = false;
+                addLog('Таймер: время истекло');
+                renderLog();
+                playBeep(4);
+                notify('Таймер', 'Время истекло');
+            }
+            renderTimer();
+        }
+
+        /* ---------- Будильник ---------- */
+        function renderAlarms() {
+            const box = document.getElementById('alarmList');
+            if (!box) return;
+            if (!state.alarms.length) {
+                box.innerHTML = '<div class="text-[11px] t-mute text-center py-3">Будильников нет</div>';
+                return;
+            }
+            box.innerHTML = state.alarms.map(a => `
+                <div class="flex items-center justify-between gap-2 py-1.5 border-b hairline last:border-0">
+                    <span class="text-sm font-bold t-main ${a.on ? '' : 'opacity-40'}">${escapeHtml(a.time)}</span>
+                    <div class="flex items-center gap-2.5">
+                        <label class="switch-toggle" onclick="event.stopPropagation()">
+                            <input type="checkbox" ${a.on ? 'checked' : ''} onchange="toggleAlarm(${a.id})" aria-label="Будильник ${escapeHtml(a.time)}">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <button onclick="deleteAlarm(${a.id})" class="t-mute hover:text-rose-500 text-xs px-1 transition-colors" aria-label="Удалить будильник">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        function addAlarm() {
+            const t = document.getElementById('newAlarmTime').value;
+            if (!t) { notify('Ошибка', 'Выберите время'); return; }
+            if (state.alarms.some(a => a.time === t)) { notify('Ошибка', 'Будильник на это время уже есть'); return; }
+            state.alarms.push({ id: Date.now(), time: t, on: true, lastFired: null });
+            state.alarms.sort((a, b) => a.time.localeCompare(b.time));
+            saveState();
+            renderAlarms();
+            notify('Будильник', 'Установлен на ' + t);
+        }
+        function toggleAlarm(id) {
+            const a = state.alarms.find(x => x.id === id);
+            if (a) { a.on = !a.on; saveState(); renderAlarms(); }
+        }
+        function deleteAlarm(id) {
+            state.alarms = state.alarms.filter(a => a.id !== id);
+            saveState();
+            renderAlarms();
+            notify('Будильник', 'Удалён');
+        }
+        function checkAlarms() {
+            const now = new Date();
+            const hm = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+            const day = dateKey(now.getFullYear(), now.getMonth(), now.getDate());
+            state.alarms.forEach(a => {
+                if (a.on && a.time === hm && a.lastFired !== day + ' ' + hm) {
+                    a.lastFired = day + ' ' + hm;
+                    addLog('Будильник сработал: ' + a.time);
+                    saveState();
+                    renderLog();
+                    playBeep(6);
+                    notify('Будильник', 'Сработал на ' + a.time);
+                }
+            });
+        }
+
+        /* ---------- Звуковой сигнал ---------- */
+        let audioCtx = null;
+        function playBeep(times) {
+            try {
+                audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                for (let i = 0; i < (times || 3); i++) {
+                    const t = audioCtx.currentTime + i * 0.45;
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = (i % 2 === 0) ? 880 : 660;
+                    g.gain.setValueAtTime(0.0001, t);
+                    g.gain.exponentialRampToValueAtTime(0.35, t + 0.04);
+                    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.4);
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.start(t);
+                    o.stop(t + 0.45);
+                }
+            } catch (e) { /* звук не критичен */ }
+        }
+
+        /* ---------- Ежесекундный тик: часы, таймер, будильник ---------- */
+        function masterTick() {
+            renderClock();
+            timerTick();
+            checkAlarms();
+        }
+
+        /* =====================================================
+           Погода: города по свайпу
+           ===================================================== */
+        function renderWeatherCity() {
+            const c = CITIES[state.weatherCity];
+            const img = document.getElementById('cityImg');
+            img.style.display = '';
+            img.src = c.img;
+            document.getElementById('weatherCityName').innerText = c.name;
+            document.getElementById('weatherDots').innerHTML = CITIES.map((x, i) =>
+                `<span class="w-1.5 h-1.5 rounded-full" style="background:${i === state.weatherCity ? '#fff' : 'rgba(255,255,255,0.35)'};"></span>`
+            ).join('');
+        }
+
+        function setWeatherCity(i) {
+            if (i < 0) i = CITIES.length - 1;
+            if (i >= CITIES.length) i = 0;
+            if (i === state.weatherCity) return;
+            state.weatherCity = i;
+            saveState();
+            renderWeatherCity();
+            fetchWeather();
+            notify('Погода', 'Город: ' + CITIES[i].name);
+        }
+
+        function fetchWeather() {
+            const temp = document.getElementById('weatherTemp');
+            const desc = document.getElementById('weatherDesc');
+            const city = CITIES[state.weatherCity];
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,weather_code&timezone=auto`)
+                .then(res => { if (!res.ok) throw new Error(res.status); return res.json(); })
+                .then(data => {
+                    if (!data || !data.current) throw new Error('no data');
+                    temp.innerText = Math.round(data.current.temperature_2m) + '°C';
+                    const codes = {
+                        0: 'Ясно', 1: 'Малооблачно', 2: 'Переменная облачность', 3: 'Пасмурно',
+                        45: 'Туман', 48: 'Изморозь', 51: 'Лёгкая морось', 53: 'Морось', 55: 'Сильная морось',
+                        61: 'Лёгкий дождь', 63: 'Дождь', 65: 'Сильный дождь', 71: 'Лёгкий снег', 73: 'Снег', 75: 'Сильный снег',
+                        80: 'Ливень', 81: 'Сильный ливень', 82: 'Очень сильный ливень', 95: 'Гроза'
+                    };
+                    desc.innerHTML = `<i class="fa-solid fa-location-dot text-white/70"></i> ${codes[data.current.weather_code] || 'Нет описания'}`;
+                })
+                .catch(() => {
+                    temp.innerText = '--°C';
+                    desc.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Нет данных о погоде';
+                });
         }
 
         /* =====================================================
@@ -1815,31 +2105,6 @@
         }
 
         /* =====================================================
-           Погода
-           ===================================================== */
-        function fetchWeather() {
-            const temp = document.getElementById('weatherTemp');
-            const desc = document.getElementById('weatherDesc');
-            fetch('https://api.open-meteo.com/v1/forecast?latitude=55.75&longitude=37.61&current=temperature_2m,weather_code&timezone=auto')
-                .then(res => { if (!res.ok) throw new Error(res.status); return res.json(); })
-                .then(data => {
-                    if (!data || !data.current) throw new Error('no data');
-                    temp.innerText = Math.round(data.current.temperature_2m) + '°C';
-                    const codes = {
-                        0: 'Ясно', 1: 'Малооблачно', 2: 'Переменная облачность', 3: 'Пасмурно',
-                        45: 'Туман', 48: 'Изморозь', 51: 'Лёгкая морось', 53: 'Морось', 55: 'Сильная морось',
-                        61: 'Лёгкий дождь', 63: 'Дождь', 65: 'Сильный дождь', 71: 'Лёгкий снег', 73: 'Снег', 75: 'Сильный снег',
-                        80: 'Ливень', 81: 'Сильный ливень', 82: 'Очень сильный ливень', 95: 'Гроза'
-                    };
-                    desc.innerHTML = `<i class="fa-solid fa-location-dot accent-color"></i> Москва · ${codes[data.current.weather_code] || 'Нет описания'}`;
-                })
-                .catch(() => {
-                    temp.innerText = '--°C';
-                    desc.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Нет данных о погоде';
-                });
-        }
-
-        /* =====================================================
            Радио: станции по свайпу, круглый регулятор громкости
            ===================================================== */
         let isPlaying = false;
@@ -1956,12 +2221,13 @@
         }
 
         /* ---------- Свайпы (мышь и касания) ---------- */
+        let lastSwipeTs = 0;
         function attachSwipe(el, onLeft, onRight) {
             if (!el) return;
             let sx = 0, sy = 0, active = false;
             el.addEventListener('pointerdown', e => {
-                // свайп не должен срабатывать на кнопках и регуляторе громкости
-                if (e.target.closest('button, input, a, #volKnob')) { active = false; return; }
+                // свайп не должен срабатывать на кнопках, полях и регуляторе громкости
+                if (e.target.closest('button, input, a, label, select, #volKnob')) { active = false; return; }
                 sx = e.clientX; sy = e.clientY; active = true;
             });
             el.addEventListener('pointerup', e => {
@@ -1969,6 +2235,7 @@
                 active = false;
                 const dx = e.clientX - sx, dy = e.clientY - sy;
                 if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                    lastSwipeTs = Date.now();
                     if (dx < 0) onLeft(); else onRight();
                 }
             });
@@ -1976,18 +2243,48 @@
         }
 
         function initSwipes() {
-            // Свайп по всему радио-виджету — смена радиостанции
+            // Свайп по радио-виджету — смена радиостанции
             attachSwipe(
                 document.getElementById('radioCard'),
                 () => selectStation(state.radioStation + 1),
                 () => selectStation(state.radioStation - 1)
             );
-            // Свайп по аватару — смена аватара
+            // Свайп по виджету погоды — смена города
             attachSwipe(
-                document.getElementById('greetingAvatar'),
-                () => cycleAvatar(1),
-                () => cycleAvatar(-1)
+                document.getElementById('weatherCard'),
+                () => setWeatherCity(state.weatherCity + 1),
+                () => setWeatherCity(state.weatherCity - 1)
             );
+            // Свайп по часам — режимы: часы → таймер → будильник
+            attachSwipe(
+                document.getElementById('clockWidget'),
+                () => clockModeSwipe(1),
+                () => clockModeSwipe(-1)
+            );
+            // Свайп по приветственной карточке — смена пользователя
+            attachSwipe(
+                document.getElementById('greetingCard'),
+                () => switchUserByDir(1),
+                () => switchUserByDir(-1)
+            );
+        }
+
+        /* ---------- Пользователь по свайпу ---------- */
+        function switchUserByDir(dir) {
+            if (state.users.length < 2) {
+                notify('Пользователи', 'Пользователь пока один — добавьте второго в настройках');
+                return;
+            }
+            let i = state.users.findIndex(u => u.id === state.currentUserId);
+            if (i < 0) i = 0;
+            i = (i + dir + state.users.length) % state.users.length;
+            switchUser(state.users[i].id);
+        }
+
+        /* ---------- Клик по аватару — смена иконки ---------- */
+        function avatarClicked() {
+            if (Date.now() - lastSwipeTs < 350) return;   // это был свайп, а не клик
+            cycleAvatar(1);
         }
 
         function cycleAvatar(dir) {
@@ -2114,8 +2411,8 @@
         window.addEventListener('load', function () {
             loadState();
             applyVolume();          // применяем сохранённую громкость после загрузки пользователей
-            renderClock();
-            setInterval(renderClock, 1000);
+            masterTick();
+            setInterval(masterTick, 1000);   // часы, таймер и будильник тикают каждую секунду
             fetchWeather();
             loadNews(false);
             setInterval(() => loadNews(false), 10 * 60 * 1000);
